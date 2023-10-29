@@ -1,5 +1,5 @@
 ﻿using GeekShopping.ProductAPI.Data.DTO;
-using GeekShopping.ProductAPI.Model.Repository;
+using GeekShopping.ProductAPI.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
