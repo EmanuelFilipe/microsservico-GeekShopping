@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GeekShopping.Web.Models
 {
-    public class ProductModel
+    public class ProductViewModel
     {
         public long Id { get; set; }
         public string Name { get; set; }
@@ -19,8 +19,8 @@ namespace GeekShopping.Web.Models
 
         public string SubstringName()
         {
-            if (Name.Length < 24) return Name;
-            return $"{Name.Substring(0, 21)} ...";
+            if (Name.Length < 20) return Name;
+            return $"{Name.Substring(0, 17)}...";
         }
 
         public string SubstringDescription()

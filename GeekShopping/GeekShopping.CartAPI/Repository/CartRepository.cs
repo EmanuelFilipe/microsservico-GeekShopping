@@ -52,7 +52,16 @@ namespace GeekShopping.CartAPI.Repository
             };
 
             var cartDetail = _context.CartDetails.Where(c => c.CartHeaderId == cart.CartHeader.Id);
-            cart.CartDetails = _mapper.Map<List<CartDetailDTO>>(cartDetail.Include(p => p.Product));
+
+            var novoCartDetail = _mapper.Map<List<CartDetailDTO>>(cartDetail);
+
+            foreach (var item in novoCartDetail)
+            {
+                var product = _context.Products.Where(x => x.Id == cart.CartHeader.Id);
+                item.Product = _mapper.Map<ProductDTO>(product.FirstOrDefault());
+            }
+
+            cart.CartDetails = _mapper.Map<List<CartDetailDTO>>(novoCartDetail);
 
             return _mapper.Map<CartDTO>(cart);
         }
@@ -122,7 +131,7 @@ namespace GeekShopping.CartAPI.Repository
                 _context.CartHeaders.Add(newCartHeader);
                 await _context.SaveChangesAsync();
 
-                cart.CartDetails.FirstOrDefault().CartHeaderId = cartHeader.Id;
+                cart.CartDetails.FirstOrDefault().CartHeaderId = newCartHeader.Id;
                 cart.CartDetails.FirstOrDefault().Product = null;
 
                 CartDetail newCartDetail = _mapper.Map<CartDetail>(cart.CartDetails.FirstOrDefault());
@@ -132,7 +141,7 @@ namespace GeekShopping.CartAPI.Repository
             else
             {
                 var cartDetail = await _context.CartDetails.AsNoTracking().FirstOrDefaultAsync(
-                        p => p.ProductId == dto.CartDetails.FirstOrDefault().ProductId &&
+                        p => p.ProductId == cart.CartDetails.FirstOrDefault().ProductId &&
                         p.CartHeaderId == cartHeader.Id);
 
                 if (cartDetail == null)

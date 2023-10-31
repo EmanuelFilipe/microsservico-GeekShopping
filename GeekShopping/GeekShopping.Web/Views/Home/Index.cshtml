@@ -1,4 +1,4 @@
-﻿@model IEnumerable<GeekShopping.Web.Models.ProductModel>
+﻿@model IEnumerable<GeekShopping.Web.Models.ProductViewModel>
 
 @{
     ViewData["Title"] = "Home Page";
@@ -13,7 +13,7 @@
                     <div class="card">
                         <img src="@product.ImageURL" class="card-img-top">
                         <div class="card-body">
-                            <h3 class="card-title text-success">@product.SubstringName()</h3>
+                            <h4 class="card-title text-success">@product.SubstringName()</h4>
                             <span class="badge badge-light mb-2">@product.CategoryName</span>
                             <p class="card-text">@Html.Raw(product.SubstringDescription())</p>
 

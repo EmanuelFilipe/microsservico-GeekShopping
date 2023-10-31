@@ -1,4 +1,4 @@
-﻿@model GeekShopping.Web.Models.ProductModel
+﻿@model GeekShopping.Web.Models.ProductViewModel
 
 <form method="post">
     <input asp-for="Id" hidden />
@@ -38,7 +38,8 @@
             </div>
             <div class="card-footer row">
                 <div class="col-12 col-md-6 pb-1">
-                    <a class="btn btn-success btn-square form-control btn-lg" style="height:50px;">
+                    <a class="btn btn-success btn-square form-control btn-lg" style="height:50px;"
+                        asp-action="Index" asp-controller="Home">
                         Back to List
                     </a>
                 </div>
