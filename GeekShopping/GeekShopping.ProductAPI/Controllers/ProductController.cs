@@ -1,4 +1,5 @@
 ﻿using GeekShopping.ProductAPI.Data.DTO;
+using GeekShopping.ProductAPI.RabbitMQSender;
 using GeekShopping.ProductAPI.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace GeekShopping.ProductAPI.Controllers
     public class ProductController : ControllerBase
     {
         private IProductRepository _productRepository;
+        private IRabbitMQMessageSender _rabbitMQMessageSender;
 
-        public ProductController(IProductRepository productRepository)
+        public ProductController(IProductRepository productRepository, IRabbitMQMessageSender rabbitMQMessageSender)
         {
-            _productRepository = productRepository ?? throw new ArgumentException(nameof(productRepository));
+            _productRepository = productRepository ?? throw new ArgumentException(nameof(productRepository)); ;
+            _rabbitMQMessageSender = rabbitMQMessageSender;
         }
 
         [HttpGet]
@@ -43,6 +46,10 @@ namespace GeekShopping.ProductAPI.Controllers
             if (dto == null) return NotFound();
 
             var product = await _productRepository.Create(dto);
+
+            // RABBITMQ
+
+            _rabbitMQMessageSender.SendMessage(product, "productcreatedqueue");
 
             return Ok(product);
         }
