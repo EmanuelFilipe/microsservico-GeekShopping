@@ -1,0 +1,1 @@
+﻿# instale o puglin rabbitmq.client 6.2.2
