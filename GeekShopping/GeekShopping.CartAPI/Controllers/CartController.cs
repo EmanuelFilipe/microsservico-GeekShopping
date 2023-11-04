@@ -1,7 +1,8 @@
-using GeekShopping.CartAPI.Data.DTO;
-using GeekShopping.CartAPI.Model;
-using GeekShopping.CartAPI.Repository.Interfaces;
+﻿using GeekShopping.CartAPI.Data.ValueObjects;
+using GeekShopping.CartAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace GeekShopping.CartAPI.Controllers
 {
@@ -9,53 +10,60 @@ namespace GeekShopping.CartAPI.Controllers
     [Route("api/v1/[controller]")]
     public class CartController : ControllerBase
     {
-        private ICartRepository _cartRepository;
+        private ICartRepository _repository;
 
-        public CartController(ICartRepository cartRepository)
+        public CartController(ICartRepository repository)
         {
-            _cartRepository = cartRepository ?? throw new ArgumentException(nameof(cartRepository));
+            _repository = repository ?? throw new
+                ArgumentNullException(nameof(repository));
         }
-        
+
         [HttpGet("find-cart/{id}")]
-        public async Task<ActionResult> FindById(string id)
+        public async Task<ActionResult<CartVO>> FindById(string id)
         {
-            var cart = await _cartRepository.FindCartByUserId(id);
-
+            var cart = await _repository.FindCartByUserId(id);
             if (cart == null) return NotFound();
-
             return Ok(cart);
         }
 
         [HttpPost("add-cart")]
-        public async Task<ActionResult> AddCart(CartDTO dto)
+        public async Task<ActionResult<CartVO>> AddCart(CartVO vo)
         {
-            var cart = await _cartRepository.SaveOrUpdateCart(dto);
-
+            var cart = await _repository.SaveOrUpdateCart(vo);
             if (cart == null) return NotFound();
-
             return Ok(cart);
         }
 
         [HttpPut("update-cart")]
-        public async Task<ActionResult> UpdateCart(CartDTO dto)
+        public async Task<ActionResult<CartVO>> UpdateCart(CartVO vo)
         {
-            var cart = await _cartRepository.SaveOrUpdateCart(dto);
-
+            var cart = await _repository.SaveOrUpdateCart(vo);
             if (cart == null) return NotFound();
-
             return Ok(cart);
         }
 
         [HttpDelete("remove-cart/{id}")]
-        public async Task<ActionResult> UpdateCart(int id)
+        public async Task<ActionResult<CartVO>> RemoveCart(int id)
         {
-            var status = await _cartRepository.RemoveFromCart(id);
-
+            var status = await _repository.RemoveFromCart(id);
             if (!status) return BadRequest();
-
             return Ok(status);
         }
 
+        [HttpPost("apply-coupon")]
+        public async Task<ActionResult<CartVO>> ApplyCoupon(CartVO vo)
+        {
+            var status = await _repository.ApplyCoupon(vo.CartHeader.UserId, vo.CartHeader.CouponCode );
+            if (!status) return NotFound();
+            return Ok(status);
+        }
 
+        [HttpDelete("remove-coupon/{userId}")]
+        public async Task<ActionResult<CartVO>> ApplyCoupon(string userId)
+        {
+            var status = await _repository.RemoveCoupon(userId);
+            if (!status) return NotFound();
+            return Ok(status);
+        }
     }
 }

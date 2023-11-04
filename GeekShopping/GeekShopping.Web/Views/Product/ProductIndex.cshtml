@@ -33,9 +33,12 @@
                             <a asp-action="ProductUpdate" asp-route-id="@item.Id" class="btn btn-success">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a asp-action="ProductDelete" asp-route-id="@item.Id" class="btn btn-danger">
-                                 <i class="fas fa-trash"></i>
-                            </a>
+                            @if(User.IsInRole("Admin"))
+                            {
+                                <a asp-action="ProductDelete" asp-route-id="@item.Id" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            }
                         </td>
                     </tr>
                 }

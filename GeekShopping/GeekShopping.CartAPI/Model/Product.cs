@@ -1,12 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GeekShopping.CartAPI.Model
 {
     [Table("product")]
     public class Product
     {
-        // configuração para nao gerar o id por auto incremento
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
         public long Id { get; set; }
@@ -18,7 +17,7 @@ namespace GeekShopping.CartAPI.Model
 
         [Column("price")]
         [Required]
-        [Range(1, 10000)]
+        [Range(1,10000)]
         public decimal Price { get; set; }
 
         [Column("description")]

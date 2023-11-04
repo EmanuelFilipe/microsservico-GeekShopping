@@ -6,3 +6,10 @@
 senha e login: guest
 
 # adicione o RabbitMQ.Client via nugget na versão 6.2.2
+
+# a ordem de execução é:
+cartapi
+couponapi
+identityserver
+productapi
+web

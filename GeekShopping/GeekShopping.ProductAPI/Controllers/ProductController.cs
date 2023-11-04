@@ -1,6 +1,7 @@
 ﻿using GeekShopping.ProductAPI.Data.DTO;
 using GeekShopping.ProductAPI.RabbitMQSender;
 using GeekShopping.ProductAPI.Repository;
+using GeekShopping.ProductAPI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -13,11 +14,15 @@ namespace GeekShopping.ProductAPI.Controllers
     {
         private IProductRepository _productRepository;
         private IRabbitMQMessageSender _rabbitMQMessageSender;
+        private readonly IConfiguration _configuracoes;
 
-        public ProductController(IProductRepository productRepository, IRabbitMQMessageSender rabbitMQMessageSender)
+        public ProductController(IProductRepository productRepository, 
+            IRabbitMQMessageSender rabbitMQMessageSender,
+            IConfiguration configuracoes)
         {
             _productRepository = productRepository ?? throw new ArgumentException(nameof(productRepository)); ;
             _rabbitMQMessageSender = rabbitMQMessageSender;
+            _configuracoes = configuracoes;
         }
 
         [HttpGet]
@@ -31,6 +36,7 @@ namespace GeekShopping.ProductAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        //[Authorize]
         public async Task<ActionResult> FindById(long id)
         {
             var product = await _productRepository.FindById(id);
@@ -41,20 +47,25 @@ namespace GeekShopping.ProductAPI.Controllers
         }
 
         [HttpPost]
+        //[Authorize]
         public async Task<ActionResult> Create([FromBody] ProductDTO dto)
         {
             if (dto == null) return NotFound();
 
             var product = await _productRepository.Create(dto);
 
-            // RABBITMQ
+            // RabbitMQ
+            //
+            var executarMensageria = bool.Parse(_configuracoes["ExecutarRabbitMQ"]);
 
-            _rabbitMQMessageSender.SendMessage(product, "productcreatedqueue");
+            if (executarMensageria)
+                _rabbitMQMessageSender.SendMessage(product, "productcreatedqueue");
 
             return Ok(product);
         }
 
         [HttpPut]
+        //[Authorize]
         public async Task<ActionResult> Update([FromBody] ProductDTO dto)
         {
             if (dto == null) return NotFound();
@@ -65,6 +76,7 @@ namespace GeekShopping.ProductAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        //[Authorize(Roles = Role.Admin)]
         public async Task<ActionResult> Delete(long id)
         {
             var status = await _productRepository.Delete(id);
