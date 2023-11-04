@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GeekShopping.CartAPI.Data.ValueObjects;
+using GeekShopping.CartAPI.Data.DTO;
 using GeekShopping.CartAPI.Model;
 using GeekShopping.CartAPI.Model.Context;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +36,7 @@ namespace GeekShopping.CartAPI.Repository
             return false;
         }
 
-        public async Task<CartVO> FindCartByUserId(string userId)
+        public async Task<CartDTO> FindCartByUserId(string userId)
         {
             Cart cart = new()
             {
@@ -46,7 +46,7 @@ namespace GeekShopping.CartAPI.Repository
             cart.CartDetails = _context.CartDetails
                 .Where(c => c.CartHeaderId == cart.CartHeader.Id)
                     .Include(c => c.Product);
-            return _mapper.Map<CartVO>(cart);
+            return _mapper.Map<CartDTO>(cart);
         }
 
         public async Task<bool> RemoveFromCart(long cartDetailsId)
@@ -76,7 +76,7 @@ namespace GeekShopping.CartAPI.Repository
             }
         }
 
-        public async Task<CartVO> SaveOrUpdateCart(CartVO vo)
+        public async Task<CartDTO> SaveOrUpdateCart(CartDTO vo)
         {
             Cart cart = _mapper.Map<Cart>(vo);
             //Checks if the product is already saved in the database if it does not exist then save
@@ -131,7 +131,7 @@ namespace GeekShopping.CartAPI.Repository
                     await _context.SaveChangesAsync();
                 } 
             }
-            return _mapper.Map<CartVO>(cart);
+            return _mapper.Map<CartDTO>(cart);
         }
 
         public async Task<bool> ApplyCoupon(string userId, string couponCode)
