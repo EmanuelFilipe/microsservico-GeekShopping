@@ -9,6 +9,8 @@ senha e login: guest
 
 # a ordem de execução é:
 cartapi
+messagebus
+orderapi
 couponapi
 identityserver
 productapi
