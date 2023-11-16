@@ -1,6 +1,6 @@
 ﻿namespace GeekShopping.OrderAPI.Messages
 {
-    public class UpdatePaymentoResultDTO
+    public class UpdatePaymentResultDTO
     {
         public long OrderId { get; set; }
         public bool Status { get; set; }

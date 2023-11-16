@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GeekShopping.OrderAPI.Model
+//namespace GeekShopping.OrderAPI.Model
 {
     [Table("order_header")]
     public class OrderHeader : BaseEntity

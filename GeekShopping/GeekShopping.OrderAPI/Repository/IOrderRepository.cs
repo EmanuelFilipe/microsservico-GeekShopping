@@ -1,4 +1,5 @@
 ﻿using GeekShopping.OrderAPI.Model;
+using GeekShopping.OrderAPI.Model.Base;
 
 namespace GeekShopping.OrderAPI.Repository
 {
