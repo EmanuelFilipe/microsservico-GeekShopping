@@ -26,7 +26,9 @@ namespace GeekShopping.ProductAPI
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
+			builder.Services.AddScoped<IDataService, DataService>();
+
+			builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
 
             builder.Services.AddControllers();
 
@@ -83,11 +85,10 @@ namespace GeekShopping.ProductAPI
             var executarMensageria = bool.Parse(builder.Configuration["ExecutarRabbitMQ"]);
 
             var app = builder.Build();
+			app.Services.CreateScope().ServiceProvider.GetService<IDataService>().InicializaDB();
 
-            //app.Services.GetService<ApplicationContext>().Database.Migrate();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+			// Configure the HTTP request pipeline.
+			if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();

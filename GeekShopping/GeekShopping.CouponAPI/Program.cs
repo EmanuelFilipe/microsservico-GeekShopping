@@ -17,6 +17,7 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<ICouponRepository, CouponRepository>();
+builder.Services.AddScoped<IDataService, DataService>();
 
 builder.Services.AddControllers();
 
@@ -71,7 +72,9 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
 var app = builder.Build();
+app.Services.CreateScope().ServiceProvider.GetService<IDataService>().InicializaDB();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

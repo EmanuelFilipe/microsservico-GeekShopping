@@ -1,5 +1,9 @@
 ﻿using GeekShopping.OrderAPI.Messages;
+using GeekShopping.OrderAPI.Model;
+using GeekShopping.OrderAPI.Model.Base;
+using GeekShopping.OrderAPI.RabbitMQSender;
 using GeekShopping.OrderAPI.Repository;
+using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -7,17 +11,14 @@ using System.Text.Json;
 
 namespace GeekShopping.OrderAPI.MessageConsumer
 {
-	public class RabbitMQPaymentConsumer : BackgroundService
+    public class RabbitMQPaymentConsumerOldQueue : BackgroundService
     {
         private readonly OrderRepository _repository;
         private IConnection _connection;
         private IModel _channel;
 		private readonly IServiceScopeFactory _serviceScopeFactory;
-		private const string ExchangeName = "DirectPaymentUpdateExchange";
-		private const string PaymentEmailUpdateQueueName = "PaymentEmailUpdateQueueName";
-		private const string PaymentOrderUpdateQueueName = "PaymentOrderUpdateQueueName";
 
-		public RabbitMQPaymentConsumer(IServiceScopeFactory serviceScopeFactory, OrderRepository repository)
+		public RabbitMQPaymentConsumerOldQueue(IServiceScopeFactory serviceScopeFactory, OrderRepository repository)
         {
 			_serviceScopeFactory = serviceScopeFactory;
 			_repository = repository;
@@ -29,24 +30,21 @@ namespace GeekShopping.OrderAPI.MessageConsumer
             };
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
-			_channel.ExchangeDeclare(ExchangeName, ExchangeType.Direct);
-			_channel.QueueDeclare(PaymentOrderUpdateQueueName, false, false, false, null);
-			_channel.QueueBind(PaymentOrderUpdateQueueName, ExchangeName, "PaymentOrder");
-
+            _channel.QueueDeclare(queue: "orderpaymentresultqueue", false, false, false, arguments: null);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (chanel, evt) =>
-            {
-                var content = Encoding.UTF8.GetString(evt.Body.ToArray());
-                UpdatePaymentResultDTO dto = JsonSerializer.Deserialize<UpdatePaymentResultDTO>(content);
-                UpdatePaymentStatus(dto).GetAwaiter().GetResult();
-                _channel.BasicAck(evt.DeliveryTag, false); // apaga da fila
-            };
-            _channel.BasicConsume(PaymentOrderUpdateQueueName, false, consumer);
+            //var consumer = new EventingBasicConsumer(_channel);
+            //consumer.Received += (chanel, evt) =>
+            //{
+            //    var content = Encoding.UTF8.GetString(evt.Body.ToArray());
+            //    UpdatePaymentResultDTO dto = JsonSerializer.Deserialize<UpdatePaymentResultDTO>(content);
+            //    UpdatePaymentStatus(dto).GetAwaiter().GetResult();
+            //    _channel.BasicAck(evt.DeliveryTag, false); // apaga da fila
+            //};
+            //_channel.BasicConsume("orderpaymentresultqueue", false, consumer);
             return Task.CompletedTask;
         }
 
@@ -54,7 +52,6 @@ namespace GeekShopping.OrderAPI.MessageConsumer
         {
             try
             {
-                await _repository.UpdateOrderPaymentStatus(dto.OrderId, true);
 				//using (var scope = _serviceScopeFactory.CreateScope())
 				//{
 				//	var dbContextOptions = scope.ServiceProvider.GetRequiredService<DbContextOptions<ApplicationContext>>();

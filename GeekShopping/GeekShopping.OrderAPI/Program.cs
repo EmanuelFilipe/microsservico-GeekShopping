@@ -15,9 +15,11 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 var dbContextBuilder = new DbContextOptionsBuilder<ApplicationContext>();
 dbContextBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 builder.Services.AddSingleton(new OrderRepository(dbContextBuilder.Options));
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddHostedService<RabbitMQCheckoutConsumer>();
 builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
+builder.Services.AddScoped<IDataService, DataService>();
 
 builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
 
