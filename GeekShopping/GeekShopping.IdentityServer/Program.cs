@@ -38,17 +38,19 @@ namespace GeekShopping.IdentityServer
               .AddInMemoryClients(IdentityConfiguration.Clients)
               .AddAspNetIdentity<ApplicationUser>();
 
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+			builder.Services.AddScoped<IDataService, DataService>();
+			builder.Services.AddScoped<IDbInitializer, DbInitializer>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
 
 
             var app = builder.Build();
-            var scope = app.Services.CreateScope();
+			app.Services.CreateScope().ServiceProvider.GetService<IDataService>().InicializaDB();
 
+            var scope = app.Services.CreateScope();
             var dbInitializer = scope.ServiceProvider.GetService<IDbInitializer>();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+			// Configure the HTTP request pipeline.
+			if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
             }

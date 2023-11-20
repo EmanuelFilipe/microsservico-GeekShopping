@@ -17,9 +17,9 @@ namespace GeekShopping.OrderAPI.Repository
         {
             if (header == null) return false;
 
-            //await using var _db = new ApplicationContext(_context);
-            //_db.OrderHeaders.Add(header);
-            //await _db.SaveChangesAsync();
+			await using var _db = new ApplicationContext(_context);
+			_db.OrderHeaders.Add(header);
+			await _db.SaveChangesAsync();
 
 			return true;
         }
@@ -36,5 +36,5 @@ namespace GeekShopping.OrderAPI.Repository
             //    await _db.SaveChangesAsync();
             //}
         }
-    }
+	}
 }
